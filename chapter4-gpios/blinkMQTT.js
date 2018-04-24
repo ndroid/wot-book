@@ -21,23 +21,23 @@ var Gpio = onoff.Gpio,
 client.on('connect', function () {
   console.log('MQTT connection established');
 //  client.subscribe('presence');
+  ledR.write(0, function() { //#E
+    console.log("Set LEDR state to: 0");
+  });
+  ledB.write(0, function() { //#E
+    console.log("Set LEDB state to: 0");
+  });
+  ledY.write(0, function() { //#E
+    console.log("Set LEDY state to: 0");
+  });
+  ledG.write(0, function() { //#E
+    console.log("Set LEDG state to: 0");
+  });
+
   client.publish(pubTopic+fieldR+'/'+channelKey, String(0));
   client.publish(pubTopic+fieldB+'/'+channelKey, String(0));
   client.publish(pubTopic+fieldY+'/'+channelKey, String(0));
   client.publish(pubTopic+fieldG+'/'+channelKey, String(0));
-
-  ledR.write(value, function() { //#E
-    console.log("Set LEDR state to: 0");
-  });
-  ledB.write(value, function() { //#E
-    console.log("Set LEDB state to: 0");
-  });
-  ledY.write(value, function() { //#E
-    console.log("Set LEDY state to: 0");
-  });
-  ledG.write(value, function() { //#E
-    console.log("Set LEDG state to: 0");
-  });
 
   client.subscribe(subTopic);
 });
