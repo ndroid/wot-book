@@ -163,6 +163,7 @@ function readTemp() {
     'humidity: ' + humidity + '%');
   publishField(tempID, fieldTemp, temperature);
   publishField(humidID, fieldHumid, humidity);
+  clearTimeout(tempTimer);
   tempTimer = setTimeout(readTemp, TEMPDELAY);
 };
 
