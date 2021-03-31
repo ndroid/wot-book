@@ -1,0 +1,67 @@
+{
+  "pi": {
+    "name": "WoT Pi",
+    "description": "A simple WoT-connected Raspberry PI for the WoT book.",
+    "port": 8484,
+    "sensors": {
+      "temperature": {
+        "name": "Temperature Sensor",
+        "description": "An ambient temperature sensor.",
+        "unit": "celsius",
+        "value": 0,
+        "gpio": 12
+      },
+      "humidity": {
+        "name": "Humidity Sensor",
+        "description": "An ambient humidity sensor.",
+        "unit": "%",
+        "value": 0,
+        "gpio": 12
+      },
+      "camera": {
+        "name": "Web camera",
+        "description": "A digital web camera.",
+        "resolution": {
+          "width": 1280,
+          "height": 720},
+        "picture": "http://ece-iot-pi.dhcp.rose-hulman.edu:8484/camera/image.jpg",
+        "type": "image/jpeg"
+      },
+      "pir": {
+        "name": "Passive Infrared",
+        "description": "A passive infrared sensor. When 'true' someone is present.",
+        "value": true,
+        "gpio": 27
+      }
+    },
+    "actuators": {
+      "leds": {
+        "1": {
+          "name": "LED 1",
+          "value": false,
+          "gpio": 10
+        },
+        "2": {
+          "name": "LED 2",
+          "value": false,
+          "gpio": 9
+        }
+      },
+      "lcd": {
+        "name": "Character LCD",
+        "description": "Parallel character 16x2 LCD display.",
+        "message": {
+          "1": "Hello", 
+          "2": "world!"
+        },
+        "gpio": {
+          "rs": 22,
+          "e": 17,
+          "data": [25, 24, 23, 18],
+          "cols": 16,
+          "rows": 2
+        }
+      }
+    }
+  }
+}
