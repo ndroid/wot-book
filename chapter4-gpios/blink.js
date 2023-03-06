@@ -1,10 +1,10 @@
 var onoff = require('onoff'); //#A
 
 var Gpio = onoff.Gpio,
-  led = new Gpio(5, 'out'), //#B
+  led = new Gpio(9, 'out'), //#B
   interval;
 
-interval = setInterval(function () { //#C
+interval = setInterval(function () { //#Cq6wC3upEuDAEyiN
   var value = (led.readSync() + 1) % 2; //#D
   led.write(value, function() { //#E
     console.log("Changed LED state to: " + value);

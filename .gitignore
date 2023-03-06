@@ -5,6 +5,9 @@ logs
 *.idea
 *.idea/
 log.txt
+*log*txt
+*Log*txt
+*screenlog*
 
 # Runtime data
 pids

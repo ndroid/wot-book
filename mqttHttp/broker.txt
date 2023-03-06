@@ -1,0 +1,2 @@
+hostname: 70ea6a420c9141169134865c7448b610.s1.eu.hivemq.cloud
+port (tls): 8883

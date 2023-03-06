@@ -11,7 +11,7 @@ var ledsPlugin = require('./plugins/internal/ledsPlugin'), //#A
 
 // Internal Plugins for sensors/actuators connected to the PI GPIOs
 // If you test this with real sensors do not forget to set simulate to 'false'
-pirPlugin.start({'simulate': true, 'frequency': 60000}); //#B
+pirPlugin.start({'simulate': false, 'frequency': 60000}); //#B
 ledsPlugin.start({'simulate': false, 'frequency': 10000}); //#B
 lcdPlugin.start({'simulate': false, 'frequency': 10000}); //#B
 dhtPlugin.start({'simulate': false, 'frequency': 10000}); //#B
@@ -25,7 +25,7 @@ var server = httpServer.listen(resources.pi.port, function () {
   console.log('HTTP server started...');
 
   // Websockets server
-//  wsServer.listen(server);
+  wsServer.listen(server);
 
   console.info('Your WoT Pi is up and running on port %s', resources.pi.port);
 });

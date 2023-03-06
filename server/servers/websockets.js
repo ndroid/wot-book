@@ -1,8 +1,9 @@
 var WebSocketServer = require('ws').Server,
   resources = require('./../resources/model');
 
-exports.listen = function(server) {
-  var wss = new WebSocketServer({httpServer: server}); //#A
+exports.listen = function(httpserver) {
+//  var wss = new WebSocketServer({httpServer: server}); //#A
+  var wss = new WebSocketServer({server: httpserver}); //#A
   console.info('WebSocket server started...');
   wss.on('connection', function (ws, request) { //#B
 //    console.info(typeof ws);
@@ -11,7 +12,9 @@ exports.listen = function(server) {
     console.info(url);
     try {
       Object.observe(selectResouce(url), function (changes) { //#C
+//      Observable.observe(selectResouce(url), function (changes) { //#C
         ws.send(JSON.stringify(changes[0].object), function () {
+          console.log('websocket update sent');
         });
       })
     }
