@@ -49,7 +49,11 @@ router.route('/lcd').get(function (req, res, next) {
 //  var selectedLcd = resources.pi.actuators.lcd.message[req.params.line];
   if (typeof req.body.value === "string") {
     resources.pi.actuators.lcd.message['1'] = req.body.value.substr(0, 16); //#C
-    resources.pi.actuators.lcd.message['2'] = req.body.value.substr(16, 16); //#C
+    if (req.body.value.length > 16) {
+      resources.pi.actuators.lcd.message['2'] = req.body.value.substr(16, 16); //#C
+    } else {
+      resources.pi.actuators.lcd.message['2'] = " "; //#C
+    }
   }
   req.result = resources.pi.actuators.lcd.message;
   next();
@@ -57,7 +61,11 @@ router.route('/lcd').get(function (req, res, next) {
 //  var selectedLcd = resources.pi.actuators.lcd.message[req.params.line];
   if (typeof req.body.value === "string") {
     resources.pi.actuators.lcd.message['1'] = req.body.value.substr(0, 16); //#C
-    resources.pi.actuators.lcd.message['2'] = req.body.value.substr(16, 16); //#C
+    if (req.body.value.length > 16) {
+      resources.pi.actuators.lcd.message['2'] = req.body.value.substr(16, 16); //#C
+    } else {
+      resources.pi.actuators.lcd.message['2'] = " "; //#C
+    }
   }
   req.result = resources.pi.actuators.lcd.message;
   next();

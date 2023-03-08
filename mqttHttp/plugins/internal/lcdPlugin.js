@@ -46,6 +46,8 @@ function observe(what) {
           console.log("publish to " + model.path + "/1 value: " + String(value));
           mqttClient.publish(model.path + '/1', String(value), {retain: true});
         }
+        obj[prop] = value;
+        return true;
       }
       if (prop == '2') {
         console.info('Change detected by LCD plugin for line 2 ...');
@@ -54,9 +56,11 @@ function observe(what) {
           console.log("publish to " + model.path + "/2 value: " + String(value));
           mqttClient.publish(model.path + '/2', String(value), {retain: true});
         }
+        obj[prop] = value;
+        return true;
       }
-      obj[prop] = value;
-      return true;
+      console.info('Bad LCD write ... for property: ' + prop + '  with value: ' + value);
+      return false;
     }});
   console.info('final message value ' + model.message);
 };
