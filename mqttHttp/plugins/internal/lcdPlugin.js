@@ -1,5 +1,8 @@
-var resources = require('./../../resources/model');
-var exec = require('child_process').exec;
+const Lcd = require("lcd");
+const resources = require('./../../resources/model');
+const exec = require('child_process').exec;
+
+const publishDelay = 5000;  // 5 second delay
 
 var interval, lcd;
 var mqttClient = null;
@@ -16,14 +19,6 @@ exports.start = function (params, client) { //#A
   if (!localParams.simulate) {
     connectHardware();
   }
-  
-  interval = setInterval(function () {
-    if (mqttClient != null) {
-      for(let line in model.message) {
-        mqttClient.publish(model.path + '/' + line, model.message[line], {retain: true});
-      }
-    }
-  }, localParams.frequency);
 };
 
 exports.stop = function () { //#A
@@ -42,25 +37,20 @@ function observe(what) {
       if (prop == '1') {
         console.info('Change detected by LCD plugin for line 1 ...');
         printline(0, value);
-        if ((mqttClient != null) && (obj[prop] !== value)) {
-          console.log("publish to " + model.path + "/1 value: " + String(value));
-          mqttClient.publish(model.path + '/1', String(value), {retain: true});
-        }
-        obj[prop] = value;
-        return true;
-      }
-      if (prop == '2') {
+//          console.log("publish to " + model.path + "/1 value: " + String(value));
+//          mqttClient.publish(model.path + '/1', String(value), {retain: true});
+      } else if (prop == '2') {
         console.info('Change detected by LCD plugin for line 2 ...');
         printline(1, value);
-        if ((mqttClient != null) && (obj[prop] !== value)) {
-          console.log("publish to " + model.path + "/2 value: " + String(value));
-          mqttClient.publish(model.path + '/2', String(value), {retain: true});
-        }
-        obj[prop] = value;
-        return true;
+      } else {
+        console.info('Bad LCD write ... for property: ' + prop + '  with value: ' + value);
+        return false;
       }
-      console.info('Bad LCD write ... for property: ' + prop + '  with value: ' + value);
-      return false;
+      if (obj[prop] !== value) {
+        obj[prop] = value;
+        schedulePublish();
+      }
+      return true;
     }});
   console.info('final message value ' + model.message);
 };
@@ -71,6 +61,8 @@ exports.message = function (line, message) {
   if (line === null) {
     if (typeof msgString === "string") {
       if (mqttClient != null) {
+        // Use direct publish here rather than calling schedulePublish() because value has 
+        //  not been updated yet for line 1 or 2, schedulePublish() uses model values
         mqttClient.publish(model.path + '/1', msgString.substr(0, 16), {retain: true});
         if (msgString.length > 16) {
           mqttClient.publish(model.path + '/2', msgString.substr(16, 16), {retain: true});
@@ -102,21 +94,56 @@ exports.message = function (line, message) {
 };
 
 function connectHardware() { //#B
-  var Lcd = require("lcd");
   lcd = new Lcd(model.gpio); //#C
 
   lcd.on('ready', _ => {
     printline(0, model.message['1']);
-    if (mqttClient != null) {
-      mqttClient.publish(model.path + '/1', model.message['1'], {retain: true});
-    }
+//    if (mqttClient != null) {
+//      mqttClient.publish(model.path + '/1', model.message['1'], {retain: true});
+//    }
     printline(1, model.message['2']);
-    if (mqttClient != null) {
-      mqttClient.publish(model.path + '/2', model.message['2'], {retain: true});
-    }
+//    if (mqttClient != null) {
+//      mqttClient.publish(model.path + '/2', model.message['2'], {retain: true});
+//    }
+    schedulePublish();
   });
   console.info('Hardware %s actuator started!', pluginName);
 };
+
+function resetHardware() { //#B
+  if (!localParams.simulate) {
+    lcd.close();
+
+    lcd = new Lcd(model.gpio); //#C
+    lcd.on('ready', _ => {
+      printline(0, model.message['1']);
+      printline(1, model.message['2']);
+      schedulePublish();
+    });
+  }
+  console.info('Hardware %s actuator re-started!', pluginName);
+};
+
+function publishUpdate() {
+  if (mqttClient != null) {
+    for(let line in model.message) {
+      console.log("publish to " + model.path + "/" + line + "  value: " + String(model.message[line]));
+      mqttClient.publish(model.path + '/' + line, model.message[line], {retain: true});
+    }
+  }
+  interval = setTimeout(publishUpdate, localParams.frequency);
+}
+
+// Delaying publish ensures when multiple messages arrive near simultaneously
+//  that infinite oscillation does not result from alternating between two
+//  values with repeated publish.
+//  Because any existing scheduled publish is cleared, the last request takes 
+//  highest precedence.
+function schedulePublish() {
+  clearInterval(interval);
+
+  interval = setTimeout(publishUpdate, publishDelay);
+}
 
 function completeJob() {
   printQueue.queue.shift();
