@@ -90,6 +90,9 @@ exports.message = function (line, message) {
 //      }
     }
   }
+  else if (line == 'reset') {
+    resetHardware();
+  }
   console.info('final message value ' + model.message);
 };
 
