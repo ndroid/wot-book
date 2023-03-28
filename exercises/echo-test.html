@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test of Echo Server</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <h1>Testing Echo Server and Client</h1>
+    <h2 id='temp0'>Request sent to echo server at  </h2>
+    <h3 id='temp1'></h3>
+    <h3 id='temp2'></h3>
+    <h4 ><br/><p>See output on echo server for more details about request</p></h4>
+	
+    <script type="text/javascript">
+    var echoUrl = 'http://localhost:9999/testing_echo_server';
+    $(document).ready( //#A
+      $.ajax({    //#B
+        dataType: "json",
+        url: echoUrl,
+        success: function(data) {    //#C
+          console.log(data);
+          $('#temp0').append(echoUrl ); 
+          $('#temp1').html("URL: " + data.url );    //#D
+          $('#temp2').html("Response: " + data.msg );    //#E
+        }
+      })
+    );
+//#A Wait until the page is loaded and then ping server
+//#B Use the AJAX helper to get the JSON payload from the server
+//#C When the response arrives, this function is called
+//#D Select the "temp1" HTML element and update its content using the data.url (the url member) returned in the JSON payload
+//#E Select the "temp2" HTML element and update its content using the data.msg (the msg member) returned in the JSON payload
+    </script>
+  </body>
+</html>

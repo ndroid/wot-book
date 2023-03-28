@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My first WoT Mashup!</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<h1>Top Rated Yelp Listing</h1>
+  <form id="message-form"> 
+    <input type="text" id="location" name="location" placeholder="Terre Haute, In" /> 
+    <button type="submit">Submit</button> 
+  </form> 
+  
+  <script type="text/javascript">
+(function($){
+// $(document).ready(function () {
+  var port = 40213;
+  var rootUrl = 'http://localhost:' + port + '/';
+
+  function mashup(location) {
+//    var yahooUrl = "https://query.yahooapis.com/v1/public/yql?q=select item from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + location + "') and u='c'&format=json";
+    var yelpSearch = rootUrl + "search?location=\"" + location + "\"&sort_by=rating";
+	$.ajax({
+	    dataType: "json",
+	    url: yelpSearch,
+	    success: function(yelpResult) {
+			console.log(yelpResult);
+//	        $('#temp').html(data.value + ' ' + data.unit); //#D
+	  console.log(yelpResult);
+      var busID = yelpResult.businesses[0].id;
+      var busName = yelpResult.businesses[0].name;
+      var imgUrl = yelpResult.businesses[0].image_url;
+      var busAddr = yelpResult.businesses[0].location.display_address;
+	  
+      console.log('Business @ ' + location + ': ' + busID);
+//	  var fullAddress = "";
+	  var x;
+      $('#address').html("");
+	  for (x in busAddr) {
+//	  	fullAddress = fullAddress + busAddr[x] + '\n';
+        $('#address').append("<p>" + busAddr[x] + "</p>");
+	  }
+      $('#business').html(busName);
+      $('#busImg').attr('src', imgUrl); //#H
+      $.getJSON(rootUrl + busID, function (busResult) {//#B
+        console.log('Business : ' + busResult.name);
+        if (busResult.hours[0].is_open_now) {
+          $('#hours').html("OPEN");
+        }
+        else {
+          $('#hours').html("CLOSED");
+        }
+      });
+	    }
+	});
+  }
+
+  function processForm(e) {
+//    $.ajax({ 
+	  console.log($('#location').val());
+      mashup($('#location').val());
+//    url: 'http://devices.webofthings.io/pi/actuators/display/content/', //#A
+//    dataType: 'json', //#B
+//    method: 'POST', //#C
+//    contentType: 'application/json', //#D
+//    data: JSON.stringify({"value": $('#value').val()}), //#E
+//    processData: false, 
+//    success: function( data, textStatus, jQxhr ){ //#F
+//      $('#response pre').html( JSON.stringify( data ) ); 
+//    }, 
+//    error: function( jqXhr, textStatus, errorThrown ){//#G 
+//      console.log( errorThrown ); 
+//    } 
+//    });
+    e.preventDefault(); 
+  }
+  $('#message-form').submit(processForm); 
+  
+}) (jQuery); //#H
+
+//#A The URL the request will be sent to
+//#B The format of the data you expect to get
+//#C The HTTP verb this request will send
+//#D The encoding of the data you are sending 
+//#E The actual data you are sending (the content of the form)
+//#F The callback to invoke if the request was successful
+//#G The callback to invoke if the request failed
+//#H We attach the processForm() function to be called when someone presses submit
+
+//  mashup('Rachel', 'Zurich, CH');
+//});
+//#A First, get the temperature in the user location from Yahoo
+//#B Then get the temperature from the WoT Pi in London
+//#C Prepare the text to publish and use it to update the content of the LCD screen
+//#D POST the message to the LCD actuator
+//#E Set a timer that will call the takePicture() function in N seconds (after the LCD content has been updated)
+//#F Generates the text to display with the user name, location and Pi temperature
+//#G Retrieve the current image from the Webcam in our office
+//#H Update the HTML <img> tag with the image URL
+  </script>
+
+<h3 id='business'></h3>
+<h4 id='address'></h4>
+<h4 id='hours'></h4>
+<img id="busImg" src=""/ >
+</body>
+</html>

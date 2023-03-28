@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My first WoT Mashup!</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <script type="text/javascript">
+$(document).ready(function () {
+  var rootUrl = 'http://ece-iot-pi.dhcp.rose-hulman.edu:8484';
+//  var rootUrl = 'http://devices.webofthings.io';
+//  var openWMapURL = "https://api.openweathermap.org/data/2.5/weather?id=";
+  var openWMapURL = "https://api.openweathermap.org/data/2.5/weather?";
+  var locationID = '4299276';	// louisville, ky
+  var appID = apikey.appID;
+  var iconURL = 'http://openweathermap.org/img/w/';
+  var refreshImg = 1;
+
+  function mashup(location) {
+//    var yahooUrl = "https://query.yahooapis.com/v1/public/yql?q=select item from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + location + "') and u='c'&format=json";
+//    var owmUrl = openWMapURL + locationID + "&APPID=" + appID + "&units=metric";
+    console.log('location is ' + location);
+    if ((location > 500) && (location < 99999)) {
+        var owmUrl = openWMapURL + "zip=" + location + "&APPID=" + appID + "&units=metric";
+    } else if ((typeof location === 'string') && (location != "")) {
+        var owmUrl = openWMapURL + "q=" + location + ",US&APPID=" + appID + "&units=metric";
+    } else {
+        var owmUrl = openWMapURL + "id=" + locationID + "&APPID=" + appID + "&units=metric";
+        location = 40213;
+    }
+      console.log('URL is ' + owmUrl);
+//    var owmUrl = openWMapURL + location + "&APPID=" + appID + "&units=metric";
+    $.getJSON(owmUrl, function (owmResult) {//#A
+      var localTemp = owmResult.main.temp;
+	  var weatherDescription = owmResult.weather[0].description;
+	  var weatherIcon = owmResult.weather[0].icon;
+      console.log('Local @ ' + location + ': ' + localTemp);
+	  
+	  var wIconURL = iconURL + weatherIcon + ".png";
+//	  $.getJSON(wIconURL, function (iconImage) {
+//        $('#weatherImg').attr('src', iconImage); 
+	  
+//	    $.ajax({ //#G
+//	      method: 'GET',
+//	      url: iconURL + weatherIcon + ".png",
+//	      dataType: 'json',
+//	      success: function (iconImage) {
+//	        console.log(iconImage);
+	        $('#weatherImg').attr('src', wIconURL); 
+			
+		      $.getJSON(rootUrl + '/pi/sensors/temperature', function (piResult) {//#B
+		        console.log('Pi @ Rose: ' + piResult.value);
+		        publishMessage(prepareMessage(weatherDescription, location, localTemp, piResult.value)); //#C
+		      });
+			
+//	      },
+//	      error: function (err) {
+//	        console.log(err);
+//	      }
+//	    });
+
+//      });
+      
+    })
+    .done( function () { console.log("got JSON"); })
+    .fail( function () { console.log("error"); })
+    .always( function () { console.log("completed getJSON"); });
+//      };
+  }
+
+  function publishMessage(message) {
+    $.ajax(rootUrl + '/pi/actuators/lcd/', { //#D
+      data: JSON.stringify({"value": message}),
+      contentType: 'application/json',
+      method: 'PUT',
+      success: function (data) {
+        $('#message').html('Published to LCD: ' + message.replace(String.fromCharCode(0xdf), String.fromCharCode(0x00b0)));
+        $('#wait').html('The Webcam image with your message will appear below in 2 seconds.');
+        console.log('We will take a picture in 2 seconds...');
+        setTimeout(takePicture, (2) * 1000); //#E 
+      }
+    });
+  }
+
+  function prepareMessage(description, location, localTemp, piTemp) { //#F
+    return location + ' ' + localTemp + String.fromCharCode(0xdf) + 'C ' + description + ' I:' + piTemp;
+  }
+
+  function takePicture() {
+    $.ajax({ //#G
+      method: 'GET',
+      url: rootUrl + '/pi/sensors/camera/picture/',
+      dataType: 'json',
+      success: function (data) {
+        console.log(data);
+        // appending random value as property forces it to fetch new image instead of cache
+        $('#camImg').attr('src', data.value + "?" + refreshImg); //#H
+        refreshImg = refreshImg + 1;
+      },
+      error: function (err) {
+        console.log(err);
+      }
+    });
+  }
+  function processForm(e) {
+	  console.log($('#location').val());
+      mashup($('#location').val());
+      e.preventDefault(); 
+  }
+  $('#message-form').submit(processForm); 
+
+//  mashup('chris', '40213');
+});
+//#A First, get the temperature in the user location from Yahoo
+//#B Then get the temperature from the WoT Pi in London
+//#C Prepare the text to publish and use it to update the content of the LCD screen
+//#D POST the message to the LCD actuator
+//#E Set a timer that will call the takePicture() function in N seconds (after the LCD content has been updated)
+//#F Generates the text to display with the user name, location and Pi temperature
+//#G Retrieve the current image from the Webcam in our office
+//#H Update the HTML <img> tag with the image URL
+  </script>
+<h1>Compare my Weather WoT Mashup</h1>
+  <form id="message-form"> 
+    <input type="text" id="location" name="location" placeholder="Terre Haute, In" /> 
+    <button type="submit">Submit</button> 
+  </form> 
+<h2 id='message'></h2>
+<img id="weatherImg" src="http://openweathermap.org/img/w/10d.png"/>
+<h3 id='wait'></h3>
+<img id="camImg" src="" width="960" height="540"/>
+</body>
+</html>
