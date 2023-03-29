@@ -22,8 +22,8 @@ const mqttUser = 'ece497iot';
 const mqttKey = 'RHITIoTece49702';
 
 const logCMIDfile = 'logCMIDmessages.txt';
-const goodCMpath = 'pi/CMID';
-const badCMpath = '/pi/CMID';
+const goodCMpath = 'pi/ID';
+const badCMpath = '/pi/ID';
   
 var mqtt = require('mqtt');
   
@@ -91,7 +91,7 @@ client.on('message', function (topic, message) {
           lcdPlugin.message(fields[3], message);
         }
         var dateStr = new Date();
-        var logString = '\tLCD\ttime: ' + date.format(dateStr, 'YYY/MM/DD HH:mm:ss') + '  topic: ' + topic + ' message: ' + message + '\n';
+        var logString = '\tLCD\ttime: ' + date.format(dateStr, 'YYYY/MM/DD HH:mm:ss') + '  topic: ' + topic + ' message: ' + message + '\n';
 //        var logString = '\tLCD\ttime: ' + Math.floor(Date.now()/1000) + '  topic: ' + topic + ' message: ' + message + '\n';
         fs.appendFile(logCMIDfile, logString, function (err) {
           if (err) 
@@ -104,7 +104,7 @@ client.on('message', function (topic, message) {
   }
   else if(topic.startsWith(goodCMpath)) {
     var dateStr = new Date();
-    var logString = 'CM# ' + fields[2] + '\ttime: ' + date.format(dateStr, 'YYY/MM/DD HH:mm:ss') + '  topic: ' + topic + ' message: ' + message + '\n';
+    var logString = 'ID ' + fields[2] + '\ttime: ' + date.format(dateStr, 'YYYY/MM/DD HH:mm:ss') + '  topic: ' + topic + ' message: ' + message + '\n';
 //    var logString = 'CM# ' + fields[2] + '\ttime: ' + Math.floor(Date.now()/1000) + '  topic: ' + topic + ' message: ' + message + '\n';
     fs.appendFile(logCMIDfile, logString, function (err) {
       if (err) 
@@ -113,7 +113,7 @@ client.on('message', function (topic, message) {
   }
   else if(topic.startsWith(badCMpath)) {
     var dateStr = new Date();
-    var logString = 'CM# ' + fields[3] + '\ttime: ' + date.format(dateStr, 'YYY/MM/DD HH:mm:ss') + '  topic: ' + topic + ' message: ' + message + '\n';
+    var logString = 'bad ID ' + fields[3] + '\ttime: ' + date.format(dateStr, 'YYYY/MM/DD HH:mm:ss') + '  topic: ' + topic + ' message: ' + message + '\n';
 //    var logString = 'CM# ' + fields[3] + '\ttime: ' + Math.floor(Date.now()/1000) + '  topic: ' + topic + ' message: ' + message + '\n';
     fs.appendFile(logCMIDfile, logString, function (err) {
       if (err) 
