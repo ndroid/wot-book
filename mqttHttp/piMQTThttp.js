@@ -16,10 +16,11 @@ var fs = require('fs');
 
 var date = require('date-and-time');
 
-const mqttHost = 'mqtts://70ea6a420c9141169134865c7448b610.s1.eu.hivemq.cloud';
-const mqttPort = 8883;
-const mqttUser = 'ece497iot';
-const mqttKey = 'RHITIoTece49702';
+var mqttConfig = require('./secret/config.json'); 
+const mqttHost = mqttConfig.mqttHost;
+const mqttPort = mqttConfig.mqttPort;
+const mqttUser = mqttConfig.mqttUser;
+const mqttKey = mqttConfig.mqttKey;
 
 const logCMIDfile = 'logCMIDmessages.txt';
 const goodCMpath = 'pi/ID';
