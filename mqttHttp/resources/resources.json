@@ -4,15 +4,15 @@
     "description": "A simple WoT-connected Raspberry PI for the WoT book.",
     "port": 8484,
     "topic":  "pi",
-    "path": "pi",
+    "path": "/pi",
     "sensors": {
       "topic":  "sensors",
-      "path": "pi/sensors",
+      "path": "/pi/sensors",
       "temperature": {
         "name": "Temperature Sensor",
         "description": "An ambient temperature sensor.",
         "topic":  "temperature",
-        "path": "pi/sensors/temperature",
+        "path": "/pi/sensors/temperature",
         "unit": "celsius",
         "value": 0,
         "gpio": 12
@@ -21,7 +21,7 @@
         "name": "Humidity Sensor",
         "description": "An ambient humidity sensor.",
         "topic":  "humidity",
-        "path": "pi/sensors/humidity",
+        "path": "/pi/sensors/humidity",
         "unit": "%",
         "value": 0,
         "gpio": 12
@@ -30,53 +30,53 @@
         "name": "Web camera",
         "description": "A digital web camera.",
         "topic":  "camera",
-        "path": "pi/sensors/camera",
+        "path": "/pi/sensors/camera",
         "resolution": {
           "width": 1280,
           "height": 720},
-        "picture": "http://ece-iot-pi.dhcp.rose-hulman.edu:8484/camera/image.jpg",
+        "picture": "/camera/image.jpg",
         "type": "image/jpeg"
       },
       "pir": {
         "name": "Passive Infrared",
         "description": "A passive infrared sensor. When '1' someone is present.",
         "topic":  "pir",
-        "path": "pi/sensors/pir",
+        "path": "/pi/sensors/pir",
         "value": 0,
         "gpio": 27
       }
     },
     "actuators": {
       "topic":  "actuators",
-      "path": "pi/actuators",
+      "path": "/pi/actuators",
       "leds": {
         "topic":  "leds",
-        "path": "pi/actuators/leds",
+        "path": "/pi/actuators/leds",
         "blue": {
           "name": "Blue LED",
           "topic":  "blue",
-          "path": "pi/actuators/leds/blue",
+          "path": "/pi/actuators/leds/blue",
           "value": false,
           "gpio": 10
         },
         "green": {
           "name": "Green LED",
           "topic":  "green",
-          "path": "pi/actuators/leds/green",
+          "path": "/pi/actuators/leds/green",
           "value": false,
           "gpio": 11
         },
         "yellow": {
           "name": "Yellow LED",
           "topic":  "yellow",
-          "path": "pi/actuators/leds/yellow",
+          "path": "/pi/actuators/leds/yellow",
           "value": false,
           "gpio": 8
         },
         "red": {
           "name": "Red LED",
           "topic":  "red",
-          "path": "pi/actuators/leds/red",
+          "path": "/pi/actuators/leds/red",
           "value": false,
           "gpio": 9
         }
@@ -85,7 +85,7 @@
         "name": "Character LCD",
         "description": "Parallel character 16x2 LCD display.",
         "topic":  "lcd",
-        "path": "pi/actuators/lcd",
+        "path": "/pi/actuators/lcd",
         "message": {
           "1": "Hello world!", 
           "2": "   -IoT-"
